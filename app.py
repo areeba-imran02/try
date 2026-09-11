@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from pypdf import PdfReader
 from groq import Groq
 
-# Set page config
+# Page Setup
 st.set_page_config(
     page_title="Learning & Career Studio (LCS)",
     page_icon="🎓",
@@ -14,112 +14,151 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for LCS Theme
+# Custom Enhanced Styling (CSS)
 st.markdown("""
 <style>
-    :root {
-        --deep-navy: #182B49;
-        --royal-purple: #6C63FF;
-        --teal: #19B5A5;
-        --soft-pink: #F8D7E8;
-        --blush-pink: #FCEAF3;
-        --rose: #E8A4C4;
-        --pink-purple: #D8B4E2;
-        --bg-soft-white: #FAFBFE;
-        --bg-cool-lavender: #F4F1FA;
-        --bg-light-pink: #FFF7FA;
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    * {
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
+    /* Main Container & Soft Background */
     .stApp {
-        background-color: var(--bg-soft-white);
-        color: #182B49;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(135deg, #F9FBFC 0%, #F0F4F8 100%);
+        color: #1A202C;
     }
 
+    /* Cards Layout */
     .lcs-card {
-        background-color: #FFFFFF;
+        background: #FFFFFF;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(24, 43, 73, 0.04);
+        border: 1px solid #E2E8F0;
+        margin-bottom: 20px;
+    }
+
+    .lcs-highlight-box {
+        background: linear-gradient(135deg, #FFF0F5 0%, #FCEAF3 100%);
+        border-left: 5px solid #E8A4C4;
         border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 4px 15px rgba(24, 43, 73, 0.05);
-        border: 1px solid #EAEFF5;
-        margin-bottom: 20px;
-    }
-    .lcs-card-highlight {
-        background-color: var(--blush-pink);
-        border-left: 5px solid var(--rose);
-        border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 15px;
-    }
-
-    .lcs-header {
-        color: var(--deep-navy);
-        font-weight: 700;
-        margin-bottom: 5px;
-    }
-    .lcs-subheader {
-        color: #5A6B82;
-        font-size: 0.95rem;
+        padding: 18px 22px;
         margin-bottom: 20px;
     }
 
-    .metric-box {
-        background: white;
+    /* Custom Navigation Buttons (Colorful Pill Style) */
+    .stRadio > label {
+        display: none !important;
+    }
+    
+    div[data-testid="stRadio"] > div {
+        gap: 8px;
+    }
+
+    div[data-testid="stRadio"] label {
+        background-color: #F1F5F9;
+        color: #334155;
         border-radius: 10px;
-        padding: 15px;
-        text-align: center;
-        border: 1px solid #EAEFF5;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    }
-    .metric-value {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--royal-purple);
-    }
-    .metric-label {
-        font-size: 0.85rem;
-        color: #6C7A89;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        padding: 10px 16px !important;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid #E2E8F0;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        width: 100%;
     }
 
-    .stButton>button {
-        background-color: var(--royal-purple);
-        color: white;
-        border-radius: 8px;
-        border: none;
-        padding: 0.5rem 1rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
+    div[data-testid="stRadio"] label:hover {
+        background-color: #E2E8F0;
+        transform: translateX(3px);
     }
-    .stButton>button:hover {
-        background-color: #554CE1;
+
+    div[data-testid="stRadio"] label[data-checked="true"] {
+        background: linear-gradient(135deg, #6C63FF 0%, #5A52E0 100%) !important;
+        color: white !important;
+        border: none !important;
         box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
     }
 
+    /* Metric Cards */
+    .metric-card {
+        background: #FFFFFF;
+        border-radius: 14px;
+        padding: 18px;
+        text-align: center;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #6C63FF;
+    }
+    .metric-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-top: 4px;
+    }
+
+    /* Agent Side Panel Styling */
+    .agent-header {
+        background: linear-gradient(135deg, #182B49 0%, #2A4365 100%);
+        color: #FFFFFF;
+        padding: 14px 18px;
+        border-radius: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 12px rgba(24, 43, 73, 0.15);
+    }
+
+    /* Button Enhancements */
+    .stButton>button {
+        background: linear-gradient(135deg, #6C63FF 0%, #5A52E0 100%);
+        color: white;
+        border-radius: 10px;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(108, 99, 255, 0.2);
+        transition: all 0.2s ease;
+    }
+    .stButton>button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(108, 99, 255, 0.3);
+    }
+
     section[data-testid="stSidebar"] {
-        background-color: #F8F9FD;
-        border-right: 1px solid #EAEFF5;
+        background-color: #FFFFFF;
+        border-right: 1px solid #E2E8F0;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Session State Initialization
+# Session State Initializer
 def init_session_state():
     defaults = {
         'groq_api_key': '',
         'profile': {
-            'name': 'Alex Student',
+            'name': 'Areeba Imran',
             'edu_level': 'University',
-            'institution': 'Tech University',
-            'degree': 'B.S. Computer Science',
-            'semester': 'Semester 6',
-            'gpa': '3.6',
+            'institution': 'University of Agriculture Faisalabad',
+            'degree': 'B.S. Information Technology',
+            'semester': 'Semester 4',
+            'gpa': '3.7',
             'subjects': ['Database Systems', 'Algorithms', 'Data Science', 'Software Engineering'],
             'skills': ['Python', 'SQL', 'HTML/CSS', 'Git', 'Data Structures'],
             'interests': ['Artificial Intelligence', 'Data Analytics', 'Web Development'],
-            'certifications': ['Python for Data Science - Coursera'],
-            'projects': ['E-commerce Web App', 'Student Management System'],
+            'certifications': ['Python for Data Science'],
+            'projects': ['Tasty Bite Cafe Web App', 'DSA Educational Series'],
             'career_goal': 'Data Analyst / AI Engineer',
             'work_type': 'Hybrid / Remote'
         },
@@ -129,28 +168,21 @@ def init_session_state():
             'Data Science': {'Pandas & Numpy': 'Strong', 'Data Cleaning': 'Strong', 'Machine Learning Basics': 'Learning', 'Visualization': 'Practicing'},
             'Software Engineering': {'Agile Methodology': 'Strong', 'Design Patterns': 'Learning', 'Testing': 'Not Started'}
         },
-        'quiz_results': [],
         'weak_topics': ['SQL JOINs', 'Dynamic Programming', 'Machine Learning Basics'],
         'career_matches': [
-            {'title': 'Data Analyst', 'match': 91, 'reasons': 'Strong SQL and Python background along with data visualization interest.'},
-            {'title': 'Python Developer', 'match': 86, 'reasons': 'Good understanding of core algorithms and backend scripting.'},
-            {'title': 'AI Engineer', 'match': 72, 'reasons': 'Interest in AI and Data Science basics, but missing deep learning & advanced math.'},
-            {'title': 'Software Engineer', 'match': 84, 'reasons': 'Solid software engineering fundamentals and project experience.'}
+            {'title': 'Data Analyst', 'match': 92, 'reasons': 'Strong SQL, Python, and data visualization alignment.'},
+            {'title': 'Python Developer', 'match': 85, 'reasons': 'Good grasp of algorithms and backend scripting.'},
+            {'title': 'AI Engineer', 'match': 78, 'reasons': 'Solid AI interest; needs deeper machine learning exposure.'}
         ],
         'skill_gaps': [
             {'skill': 'Power BI / Tableau', 'priority': 'High', 'status': 'Missing'},
             {'skill': 'Advanced SQL Window Functions', 'priority': 'Medium', 'status': 'Developing'},
-            {'skill': 'Statistics & Probability', 'priority': 'High', 'status': 'Developing'},
-            {'skill': 'Machine Learning Algorithms', 'priority': 'Medium', 'status': 'Developing'}
+            {'skill': 'Statistics & Probability', 'priority': 'High', 'status': 'Developing'}
         ],
-        'cv_score': 78,
-        'cv_analysis': "Solid educational foundation and core programming skills. Needs more quantifiable project outcomes and professional experience details.",
-        'readiness_score': 82,
+        'readiness_score': 84,
         'chat_history': [
-            {"role": "assistant", "content": "Hello Alex! I am your LCS Intelligent Agent. How can I assist your study or career goals today?"}
-        ],
-        'agent_open': False,
-        'rag_docs': []
+            {"role": "assistant", "content": "Salam Areeba! Main aap ka LCS Intelligent Assistant hoon. Aaj parhai ya career guidance mein kis tarah madad karoon?"}
+        ]
     }
     for key, val in defaults.items():
         if key not in st.session_state:
@@ -158,10 +190,11 @@ def init_session_state():
 
 init_session_state()
 
+# LLM Call Function
 def call_groq_llm(prompt, system_prompt="You are an intelligent educational and career advisor AI for Learning & Career Studio (LCS)."):
     api_key = st.session_state.get('groq_api_key', '')
     if not api_key:
-        return "⚠️ Groq API key is not configured. Please enter it in the sidebar settings."
+        return "⚠️ Groq API key is missing. Please enter your API key at the top bar."
     try:
         client = Groq(api_key=api_key)
         completion = client.chat.completions.create(
@@ -171,551 +204,282 @@ def call_groq_llm(prompt, system_prompt="You are an intelligent educational and 
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
-            max_tokens=1500
+            max_tokens=1200
         )
         return completion.choices[0].message.content
     except Exception as e:
         return f"Error contacting Groq API: {str(e)}"
 
-# Sidebar Navigation
-with st.sidebar:
-    st.markdown("<h2 style='color: #182B49; margin-bottom: 0;'>🎓 LCS</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #6C63FF; font-weight: 600; font-size: 0.85rem;'>Learning & Career Studio</p>", unsafe_allow_html=True)
-    st.divider()
+# Header Area
+top_col1, top_col2 = st.columns([3, 1])
+with top_col1:
+    st.markdown("<h1 style='color: #182B49; margin-bottom: 0px; font-weight: 800;'>🎓 Learning & Career Studio</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #64748B; font-size: 0.95rem; font-weight: 500;'>Intelligent Student Ecosystem — School to Career Mastery</p>", unsafe_allow_html=True)
 
+with top_col2:
     if not st.session_state['groq_api_key']:
-        api_input = st.text_input("Enter Groq API Key", type="password", key="groq_key_input")
-        if api_input:
-            st.session_state['groq_api_key'] = api_input
+        key_in = st.text_input("🔑 Private Groq API Key", type="password", help="Enter your Groq key here. It remains private in your session.")
+        if key_in:
+            st.session_state['groq_api_key'] = key_in
             st.rerun()
     else:
-        st.success("Groq API Connected", icon="✅")
-
-    st.markdown("### 📌 NAVIGATION")
-    nav = st.radio(
-        "Select Section",
-        [
-            "Dashboard",
-            "My Profile",
-            "Study Workspace",
-            "Study Roadmap & Planner",
-            "Quizzes & Mock Exams",
-            "PDF Material & RAG",
-            "Career Discovery & Skills",
-            "CV & Job Matcher",
-            "Interview Intelligence",
-            "Analytics & Next Action"
-        ],
-        label_visibility="collapsed"
-    )
-
-    st.divider()
-
-    if st.button("💬 Toggle LCS Agent Panel", use_container_width=True):
-        st.session_state['agent_open'] = not st.session_state['agent_open']
-
-# Main Header
-col_head1, col_head2 = st.columns([3, 1])
-with col_head1:
-    st.markdown("<h1 style='color: #182B49; font-size: 2rem; margin-bottom: 0;'>Learning & Career Studio</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #5A6B82; font-size: 1rem;'>Intelligent Student Ecosystem — School to Career Mastery</p>", unsafe_allow_html=True)
-
-with col_head2:
-    st.markdown(f"""
-    <div style="text-align: right; padding-top: 10px;">
-        <span style="background-color: #F4F1FA; color: #6C63FF; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.85rem;">
-            👤 {st.session_state.profile['name']} ({st.session_state.profile['degree']})
-        </span>
-    </div>
-    """, unsafe_allow_html=True)
+        st.success("API Key Active", icon="🔒")
 
 st.divider()
 
-# Agent Drawer
-if st.session_state['agent_open']:
-    with st.expander("🤖 LCS Intelligent Agent (Context-Aware Assistant)", expanded=True):
-        st.markdown("""
-        <div style="background-color: #182B49; color: white; padding: 10px 15px; border-radius: 8px 8px 0 0; font-weight: 600;">
-            💬 LCS Live Agent | Personal Mentor & Assistant
-        </div>
-        """, unsafe_allow_html=True)
-        
-        chat_container = st.container(height=300)
-        for msg in st.session_state.chat_history:
-            with chat_container.chat_message(msg["role"]):
-                st.write(msg["content"])
+# Custom Sidebar Navigation with Icons
+with st.sidebar:
+    st.markdown("<h3 style='color:#182B49; margin-bottom: 5px; font-weight: 700;'>📌 NAVIGATION</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:0.8rem; color:#64748B;'>Select Studio Workspace</p>", unsafe_allow_html=True)
+    
+    nav_options = [
+        "📊 Dashboard",
+        "👤 My Profile",
+        "📖 Study Workspace",
+        "🗺️ Study Roadmap & Planner",
+        "✏️ Quizzes & Mock Exams",
+        "📚 PDF Material & RAG",
+        "🎯 Career Discovery & Skills",
+        "📄 CV & Job Matcher",
+        "🎤 Interview Intelligence",
+        "📈 Analytics & Next Action"
+    ]
+    
+    nav_selected = st.radio("Select Section", nav_options, label_visibility="collapsed")
 
-        user_query = st.chat_input("Ask LCS about studies, weak topics, career roadmap, CV or jobs...", key="agent_chat_input")
-        if user_query:
-            st.session_state.chat_history.append({"role": "user", "content": user_query})
-            
-            context_prompt = f"""
-            Student Context:
-            - Name: {st.session_state.profile['name']}
-            - Level: {st.session_state.profile['edu_level']} ({st.session_state.profile['degree']}, {st.session_state.profile['semester']})
-            - Weak Topics: {', '.join(st.session_state.weak_topics)}
-            - Career Goal: {st.session_state.profile['career_goal']}
-            - Skill Gaps: {[g['skill'] for g in st.session_state.skill_gaps]}
-            - Readiness Score: {st.session_state.readiness_score}%
+# Page Layout: Workspace (Left 70%) | Persistent Agent (Right 30%)
+main_content, right_agent_col = st.columns([2.5, 1.1])
 
-            User Query: {user_query}
-
-            Provide a direct, practical, and highly personalized mentor response. Support English, Urdu, or Roman Urdu as requested.
-            """
-            
-            with st.spinner("LCS Agent thinking..."):
-                reply = call_groq_llm(context_prompt)
-                st.session_state.chat_history.append({"role": "assistant", "content": reply})
-                st.rerun()
-
-# 1. Dashboard
-if nav == "Dashboard":
-    st.markdown("<h2 class='lcs-header'>📊 Executive Student Dashboard</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='lcs-subheader'>Overview of learning momentum, skill acquisition, and career readiness.</p>", unsafe_allow_html=True)
-
-    m1, m2, m3, m4 = st.columns(4)
-    with m1:
-        st.markdown("""
-        <div class="metric-box">
-            <div class="metric-value">76%</div>
-            <div class="metric-label">Study Progress</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with m2:
-        st.markdown("""
-        <div class="metric-box">
-            <div class="metric-value" style="color: #19B5A5;">84%</div>
-            <div class="metric-label">Skill Strength</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with m3:
-        st.markdown("""
-        <div class="metric-box">
-            <div class="metric-value" style="color: #E8A4C4;">91%</div>
-            <div class="metric-label">Top Career Match</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with m4:
-        st.markdown(f"""
-        <div class="metric-box">
-            <div class="metric-value" style="color: #6C63FF;">{st.session_state.readiness_score}%</div>
-            <div class="metric-label">Career Readiness</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
+# Attached Right Panel Agent (Always Visible)
+with right_agent_col:
     st.markdown("""
-    <div class="lcs-card-highlight">
-        <h4 style="margin:0 0 5px 0; color: #182B49;">⚡ Next Best Action Recommendation</h4>
-        <p style="margin:0; font-size: 0.95rem; color: #4A5568;">
-            <b>Focus Area: SQL JOINs & Power BI Skill Gap</b><br>
-            Your recent quiz showed weaknesses in relational joins, while your target role (Data Analyst) requires Power BI mastery.
-        </p>
+    <div class='agent-header'>
+        🤖 LCS Intelligent Assistant
     </div>
     """, unsafe_allow_html=True)
+    
+    chat_box = st.container(height=480)
+    for msg in st.session_state.chat_history:
+        with chat_box.chat_message(msg["role"]):
+            st.write(msg["content"])
 
-    col_d1, col_d2 = st.columns(2)
-    with col_d1:
+    agent_input = st.chat_input("Ask agent anything...", key="right_agent_input")
+    if agent_input:
+        st.session_state.chat_history.append({"role": "user", "content": agent_input})
+        
+        context_prompt = f"""
+        Student Profile: {st.session_state.profile['name']}, {st.session_state.profile['degree']} ({st.session_state.profile['institution']})
+        Weak Topics: {', '.join(st.session_state.weak_topics)}
+        Career Goal: {st.session_state.profile['career_goal']}
+        
+        User Message: {agent_input}
+        
+        Provide a friendly, direct, mentor-style response in English, Urdu, or Roman Urdu as required.
+        """
+        with st.spinner("Agent typing..."):
+            reply = call_groq_llm(context_prompt)
+            st.session_state.chat_history.append({"role": "assistant", "content": reply})
+            st.rerun()
+
+# Main Workspace Content
+with main_content:
+
+    # 1. Dashboard
+    if "Dashboard" in nav_selected:
         st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        st.markdown("<h3 class='lcs-header'>📚 Academic Progress by Subject</h3>", unsafe_allow_html=True)
-        df_prog = pd.DataFrame({
-            'Subject': ['Database Systems', 'Algorithms', 'Data Science', 'Software Eng.'],
-            'Mastery (%)': [65, 80, 75, 85]
-        })
-        fig = px.bar(df_prog, x='Mastery (%)', y='Subject', orientation='h', color='Mastery (%)',
-                     color_continuous_scale=['#D8B4E2', '#6C63FF', '#182B49'])
-        fig.update_layout(height=250, margin=dict(l=0, r=0, t=20, b=0))
-        st.plotly_chart(fig, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(f"### 👋 Welcome Back, {st.session_state.profile['name']}!")
+        st.markdown(f"<p style='color:#64748B;'>{st.session_state.profile['degree']} | {st.session_state.profile['institution']}</p>", unsafe_allow_html=True)
+        
+        m1, m2, m3, m4 = st.columns(4)
+        with m1:
+            st.markdown("<div class='metric-card'><div class='metric-value'>78%</div><div class='metric-label'>Study Progress</div></div>", unsafe_allow_html=True)
+        with m2:
+            st.markdown("<div class='metric-card'><div class='metric-value' style='color:#19B5A5;'>86%</div><div class='metric-label'>Skill Strength</div></div>", unsafe_allow_html=True)
+        with m3:
+            st.markdown("<div class='metric-card'><div class='metric-value' style='color:#E8A4C4;'>92%</div><div class='metric-label'>Career Match</div></div>", unsafe_allow_html=True)
+        with m4:
+            st.markdown(f"<div class='metric-card'><div class='metric-value' style='color:#6C63FF;'>{st.session_state.readiness_score}%</div><div class='metric-label'>Readiness Score</div></div>", unsafe_allow_html=True)
 
-    with col_d2:
-        st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        st.markdown("<h3 class='lcs-header'>🎯 Target Career Match Alignment</h3>", unsafe_allow_html=True)
-        cm_df = pd.DataFrame(st.session_state.career_matches)
-        fig_pie = px.pie(cm_df, values='match', names='title', color_discrete_sequence=['#6C63FF', '#19B5A5', '#E8A4C4', '#D8B4E2'])
-        fig_pie.update_layout(height=250, margin=dict(l=0, r=0, t=20, b=0))
-        st.plotly_chart(fig_pie, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
 
-    st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-    st.markdown("<h3 class='lcs-header'>⚠️ Detected Weak Topics Needing Revision</h3>", unsafe_allow_html=True)
-    cols = st.columns(len(st.session_state.weak_topics))
-    for idx, topic in enumerate(st.session_state.weak_topics):
-        with cols[idx]:
-            st.warning(f"**{topic}**\n\n*Action Required: Take practice quiz & review notes.*")
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class='lcs-highlight-box'>
+            <h4 style='margin:0 0 6px 0; color:#182B49;'>⚡ Recommended Focus Action</h4>
+            <p style='margin:0; color:#4A5568; font-size:0.95rem;'>
+                <b>Topic: SQL JOINs & Power BI Integration</b><br>
+                Aap ke target goal <i>Data Analyst</i> ke liye multi-table relational queries aur visualization essential hain.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
-# 2. My Profile
-elif nav == "My Profile":
-    st.markdown("<h2 class='lcs-header'>👤 Student Profile & Preferences</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='lcs-subheader'>Configure academic credentials, current skills, and career direction.</p>", unsafe_allow_html=True)
-
-    with st.form("profile_form"):
-        col1, col2 = st.columns(2)
-        with col1:
-            name = st.text_input("Full Name", value=st.session_state.profile['name'])
-            edu_level = st.selectbox("Education Level", ["School", "College / Intermediate", "University"], index=2)
-            institution = st.text_input("School / College / University Name", value=st.session_state.profile['institution'])
-            degree = st.text_input("Degree / Program / Class", value=st.session_state.profile['degree'])
-            semester = st.text_input("Semester / Grade", value=st.session_state.profile['semester'])
-            gpa = st.text_input("GPA / Marks (Optional)", value=st.session_state.profile['gpa'])
-
-        with col2:
-            subjects_str = st.text_area("Enrolled Subjects (comma-separated)", value=", ".join(st.session_state.profile['subjects']))
-            skills_str = st.text_area("Current Skills (comma-separated)", value=", ".join(st.session_state.profile['skills']))
-            interests_str = st.text_area("Interests (comma-separated)", value=", ".join(st.session_state.profile['interests']))
-            career_goal = st.text_input("Primary Target Career Goal", value=st.session_state.profile['career_goal'])
-            work_type = st.selectbox("Preferred Work Type", ["Remote", "Hybrid", "On-site"], index=1)
-
-        submitted = st.form_submit_button("Save & Update Profile Intelligence")
-        if submitted:
-            st.session_state.profile.update({
-                'name': name,
-                'edu_level': edu_level,
-                'institution': institution,
-                'degree': degree,
-                'semester': semester,
-                'gpa': gpa,
-                'subjects': [s.strip() for s in subjects_str.split(',') if s.strip()],
-                'skills': [s.strip() for s in skills_str.split(',') if s.strip()],
-                'interests': [i.strip() for i in interests_str.split(',') if i.strip()],
-                'career_goal': career_goal,
-                'work_type': work_type
+        c1, c2 = st.columns(2)
+        with c1:
+            st.markdown("#### 📘 Subject Mastery")
+            df_prog = pd.DataFrame({
+                'Subject': ['Database', 'Algorithms', 'Data Science', 'Software Eng'],
+                'Mastery': [68, 82, 76, 88]
             })
-            st.success("Profile saved successfully! Intelligence modules updated.")
+            fig = px.bar(df_prog, x='Mastery', y='Subject', orientation='h', color='Mastery',
+                         color_continuous_scale=['#D8B4E2', '#6C63FF', '#182B49'])
+            fig.update_layout(height=220, margin=dict(l=0, r=0, t=10, b=0))
+            st.plotly_chart(fig, use_container_width=True)
 
-# 3. Study Workspace
-elif nav == "Study Workspace":
-    st.markdown("<h2 class='lcs-header'>📖 Intelligent Study Workspace</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='lcs-subheader'>Deep-dive into subject topics with automated AI explanations and key summaries.</p>", unsafe_allow_html=True)
+        with c2:
+            st.markdown("#### 🎯 Target Path Alignment")
+            cm_df = pd.DataFrame(st.session_state.career_matches)
+            fig_pie = px.pie(cm_df, values='match', names='title', color_discrete_sequence=['#6C63FF', '#19B5A5', '#E8A4C4'])
+            fig_pie.update_layout(height=220, margin=dict(l=0, r=0, t=10, b=0))
+            st.plotly_chart(fig_pie, use_container_width=True)
 
-    col_s1, col_s2 = st.columns([1, 2])
-    with col_s1:
-        st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        selected_subject = st.selectbox("Select Subject", st.session_state.profile['subjects'])
-        
-        topics_dict = {
-            'Database Systems': ['SQL JOINs', 'Normalization', 'Indexing', 'Transactions & ACID'],
-            'Algorithms': ['Sorting & Searching', 'Dynamic Programming', 'Graph Algorithms', 'Trees & Heaps'],
-            'Data Science': ['Pandas & Numpy', 'Data Cleaning', 'Machine Learning Basics', 'Data Visualization'],
-            'Software Engineering': ['Agile Methodology', 'Design Patterns', 'Software Testing', 'CI/CD Pipelines']
-        }
-        
-        available_topics = topics_dict.get(selected_subject, ['General Overview', 'Core Concepts'])
-        selected_topic = st.selectbox("Select Topic", available_topics)
-        
-        st.markdown("---")
-        action_mode = st.radio("Action", ["Topic Explanation & Examples", "Generate Concise Notes", "Quick Revision Flashcards"])
-        generate_btn = st.button("Generate Study Insights")
+        st.markdown("#### ⚠️ Weak Topics Needing Revision")
+        w_cols = st.columns(len(st.session_state.weak_topics))
+        for idx, topic in enumerate(st.session_state.weak_topics):
+            with w_cols[idx]:
+                st.warning(f"**{topic}**\n\n*Action: Take quiz & review notes.*")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with col_s2:
+    # 2. My Profile
+    elif "My Profile" in nav_selected:
         st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        if generate_btn:
-            with st.spinner("Generating conceptual explanation from Groq OSS 120B..."):
-                prompt = f"""
-                Provide a structured educational guide for:
-                Subject: {selected_subject}
-                Topic: {selected_topic}
-                Mode: {action_mode}
-
-                Format clearly with:
-                - Key Concepts
-                - Real-World Example
-                - Code snippet / Diagram representation if applicable
-                - Common Exam Pitfalls
-                """
-                response = call_groq_llm(prompt)
-                st.markdown(response)
-        else:
-            st.info("👈 Select a subject and topic, then click 'Generate Study Insights' to begin.")
+        st.markdown("### 👤 Student Profile & Credentials")
+        with st.form("prof_form"):
+            col1, col2 = st.columns(2)
+            with col1:
+                p_name = st.text_input("Full Name", value=st.session_state.profile['name'])
+                p_inst = st.text_input("Institution", value=st.session_state.profile['institution'])
+                p_deg = st.text_input("Degree / Program", value=st.session_state.profile['degree'])
+            with col2:
+                p_goal = st.text_input("Target Career Goal", value=st.session_state.profile['career_goal'])
+                p_skills = st.text_area("Skills List (comma-separated)", value=", ".join(st.session_state.profile['skills']))
+            
+            if st.form_submit_button("Save Profile Settings"):
+                st.session_state.profile['name'] = p_name
+                st.session_state.profile['institution'] = p_inst
+                st.session_state.profile['degree'] = p_deg
+                st.session_state.profile['career_goal'] = p_goal
+                st.session_state.profile['skills'] = [s.strip() for s in p_skills.split(',') if s.strip()]
+                st.success("Profile updated successfully!")
+                st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-# 4. Study Roadmap & Planner
-elif nav == "Study Roadmap & Planner":
-    st.markdown("<h2 class='lcs-header'>🗺️ Dynamic Study Roadmap & Planner</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='lcs-subheader'>Adaptive learning timeline based on mastery levels and upcoming exams.</p>", unsafe_allow_html=True)
-
-    tab1, tab2 = st.tabs(["Interactive Topic Roadmap", "Exam Prep Planner Generator"])
-
-    with tab1:
+    # 3. Study Workspace
+    elif "Study Workspace" in nav_selected:
         st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        st.markdown("### Subject Topic Master Map")
+        st.markdown("### 📖 Concept Workspace & Explanations")
         
-        for subj, topics in st.session_state.study_progress.items():
-            st.markdown(f"#### 📘 {subj}")
-            cols = st.columns(len(topics))
-            for i, (topic_name, status) in enumerate(topics.items()):
-                color = "#19B5A5" if status == "Strong" else "#6C63FF" if status == "Learning" else "#E8A4C4" if status == "Needs Revision" else "#A0AEC0"
-                with cols[i]:
-                    st.markdown(f"""
-                    <div style="border: 1px solid #CBD5E0; border-top: 4px solid {color}; border-radius: 6px; padding: 10px; text-align: center; background: white;">
-                        <b style="font-size: 0.9rem;">{topic_name}</b><br>
-                        <span style="font-size:0.75rem; color:{color}; font-weight:600;">{status}</span>
-                    </div>
-                    """, unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
+        sub_col, top_col = st.columns(2)
+        with sub_col:
+            selected_sub = st.selectbox("Select Subject", st.session_state.profile['subjects'])
+        with top_col:
+            selected_top = st.selectbox("Select Topic", ['SQL JOINs', 'Dynamic Programming', 'Pandas & Numpy', 'Agile Methodologies'])
+        
+        mode = st.radio("Output Mode", ["Detailed Concept Explanation", "Quick Revision Notes", "Code Example"], horizontal=True)
+        
+        if st.button("Generate Study Insights"):
+            with st.spinner("Generating conceptual explanation..."):
+                res = call_groq_llm(f"Explain {selected_top} in {selected_sub} for an IT student in {mode} format.")
+                st.markdown(res)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with tab2:
+    # 4. Study Roadmap & Planner
+    elif "Study Roadmap" in nav_selected:
         st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        st.markdown("### 📅 Automated Study Schedule Generator")
+        st.markdown("### 🗓️ Adaptive Exam Roadmap Generator")
         
-        col_p1, col_p2 = st.columns(2)
-        with col_p1:
-            exam_days = st.number_input("Days Remaining Until Exam", min_value=1, max_value=60, value=14)
-            daily_hours = st.slider("Available Daily Study Hours", 1, 10, 3)
-        with col_p2:
-            target_subjects = st.multiselect("Select Subjects to Cover", st.session_state.profile['subjects'], default=st.session_state.profile['subjects'][:2])
-            focus_weak = st.checkbox("Prioritize Weak Topics Automatically", value=True)
-
-        if st.button("Generate Optimized Study Plan"):
-            with st.spinner("Calculating optimal study schedule..."):
-                prompt = f"""
-                Create a day-by-day study timetable for {exam_days} days.
-                Daily Study Capacity: {daily_hours} hours/day.
-                Subjects: {', '.join(target_subjects)}
-                Weak Topics to Prioritize: {', '.join(st.session_state.weak_topics)}
-                Structure it as:
-                - Day Range
-                - Focus Topics
-                - Daily Activity (Learning, Revision, Practice Quiz)
-                """
-                plan = call_groq_llm(prompt)
+        days = st.number_input("Days remaining until Exam", min_value=1, max_value=60, value=14)
+        hours = st.slider("Daily available study hours", 1, 10, 4)
+        
+        if st.button("Generate Automated Schedule"):
+            with st.spinner("Building optimal timetable..."):
+                plan = call_groq_llm(f"Create a day-by-day {days}-day study plan ({hours} hrs/day) prioritizing weak topics: {st.session_state.weak_topics}.")
                 st.markdown(plan)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# 5. Quizzes & Mock Exams
-elif nav == "Quizzes & Mock Exams":
-    st.markdown("<h2 class='lcs-header'>✏️ Quiz Generator & Adaptive Mock Exams</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='lcs-subheader'>Test knowledge, receive immediate evaluation, and update weak topic detection.</p>", unsafe_allow_html=True)
-
-    st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-    col_q1, col_q2, col_q3 = st.columns(3)
-    with col_q1:
-        q_subj = st.selectbox("Subject", st.session_state.profile['subjects'], key="q_subj")
-    with col_q2:
-        q_topic = st.selectbox("Topic", ['SQL JOINs', 'Dynamic Programming', 'Pandas & Numpy', 'Agile Methodology'])
-    with col_q3:
-        q_diff = st.selectbox("Difficulty", ["Beginner", "Intermediate", "Advanced"])
-
-    if st.button("Generate Quiz Questions"):
-        with st.spinner("Generating customized quiz..."):
-            prompt = f"Generate 3 multiple choice questions for subject {q_subj}, topic {q_topic}, level {q_diff}. Include choices A, B, C, D and indicate correct answer at the end."
-            quiz_content = call_groq_llm(prompt)
-            st.session_state['current_quiz'] = quiz_content
-
-    if 'current_quiz' in st.session_state:
-        st.markdown("### 📝 Quiz Session")
-        st.markdown(st.session_state['current_quiz'])
-        
-        st.markdown("---")
-        st.markdown("#### Submit Answers for Auto-Evaluation")
-        user_ans = st.text_area("Enter your answers (e.g., 1. A, 2. C, 3. B)")
-        
-        if st.button("Submit & Evaluate Quiz"):
-            with st.spinner("Evaluating responses..."):
-                eval_prompt = f"""
-                Evaluate these student answers against the quiz.
-                Quiz: {st.session_state['current_quiz']}
-                Student Answers: {user_ans}
-
-                Provide:
-                1. Score (e.g. 2/3)
-                2. Detailed Explanations
-                3. Strong vs Weak Topic identification based on errors.
-                """
-                eval_res = call_groq_llm(eval_prompt)
-                st.markdown(eval_res)
-                
-                st.session_state.quiz_results.append({'subject': q_subj, 'topic': q_topic, 'score': 'Evaluated'})
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# 6. PDF Material & RAG
-elif nav == "PDF Material & RAG":
-    st.markdown("<h2 class='lcs-header'>📚 PDF Material RAG Intelligence</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='lcs-subheader'>Upload lecture slides or notes to query, summarize, or extract quiz questions.</p>", unsafe_allow_html=True)
-
-    uploaded_file = st.file_uploader("Upload Course Material (PDF)", type=["pdf"])
-
-    if uploaded_file is not None:
-        try:
-            reader = PdfReader(uploaded_file)
-            extracted_text = ""
-            for page in reader.pages:
-                text = page.extract_text()
-                if text:
-                    extracted_text += text + "\n"
-            
-            st.session_state['rag_text'] = extracted_text
-            st.success(f"Successfully processed PDF! Extracted {len(extracted_text)} characters.")
-        except Exception as e:
-            st.error(f"Error reading PDF: {e}")
-
-    if 'rag_text' in st.session_state and st.session_state['rag_text']:
+    # 5. Quizzes & Mock Exams
+    elif "Quizzes" in nav_selected:
         st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        st.markdown("### 🔍 Ask Questions from Uploaded PDF")
-        pdf_query = st.text_input("Ask anything grounded in your uploaded document:")
+        st.markdown("### 📝 Adaptive Quiz & Mock Assessment")
         
-        col_rag1, col_rag2 = st.columns(2)
-        with col_rag1:
-            if st.button("Answer Query"):
-                if pdf_query:
-                    with st.spinner("Searching document context..."):
-                        doc_snippet = st.session_state['rag_text'][:4000]
-                        prompt = f"Document Context:\n{doc_snippet}\n\nQuestion: {pdf_query}\nAnswer based ONLY on the context provided:"
-                        ans = call_groq_llm(prompt)
-                        st.markdown(ans)
-        with col_rag2:
-            if st.button("Generate Notes & Summary"):
-                with st.spinner("Summarizing document..."):
-                    doc_snippet = st.session_state['rag_text'][:4000]
-                    prompt = f"Document Context:\n{doc_snippet}\n\nProvide key revision bullet points and concise summary:"
-                    summary = call_groq_llm(prompt)
-                    st.markdown(summary)
+        q_topic = st.selectbox("Quiz Topic", ['SQL JOINs', 'Dynamic Programming', 'Pandas & Numpy'])
+        if st.button("Generate Practice Questions"):
+            with st.spinner("Preparing quiz..."):
+                q_text = call_groq_llm(f"Generate 3 multiple-choice questions on {q_topic} with choices and an answer key at the bottom.")
+                st.session_state['active_quiz'] = q_text
+        
+        if 'active_quiz' in st.session_state:
+            st.markdown(st.session_state['active_quiz'])
         st.markdown("</div>", unsafe_allow_html=True)
 
-# 7. Career Discovery & Skills
-elif nav == "Career Discovery & Skills":
-    st.markdown("<h2 class='lcs-header'>🎯 Career Discovery & Skill Gap Matrix</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='lcs-subheader'>Discover high-alignment career paths and pinpoint technical skill gaps.</p>", unsafe_allow_html=True)
-
-    col_cd1, col_cd2 = st.columns([1, 1])
-
-    with col_cd1:
+    # 6. PDF Material & RAG
+    elif "PDF Material" in nav_selected:
         st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        st.markdown("### 🧭 Recommended Career Pathways")
-        for match in st.session_state.career_matches:
-            st.markdown(f"""
-            <div style="border: 1px solid #EAEFF5; padding: 12px; border-radius: 8px; margin-bottom: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h4 style="margin: 0; color: #182B49;">{match['title']}</h4>
-                    <span style="background: #FCEAF3; color: #E8A4C4; padding: 4px 10px; border-radius: 12px; font-weight: bold;">
-                        {match['match']}% Match
-                    </span>
-                </div>
-                <p style="font-size: 0.85rem; color: #5A6B82; margin-top: 5px;">{match['reasons']}</p>
-            </div>
-            """, unsafe_allow_html=True)
+        st.markdown("### 📄 Lecture PDF Q&A & Summarizer")
+        
+        uploaded_pdf = st.file_uploader("Upload Notes or Lecture Slides (PDF)", type=["pdf"])
+        if uploaded_pdf:
+            reader = PdfReader(uploaded_pdf)
+            pdf_text = "".join([page.extract_text() for page in reader.pages if page.extract_text()])
+            st.session_state['pdf_context'] = pdf_text[:3500]
+            st.success("Document loaded successfully!")
+
+        if 'pdf_context' in st.session_state:
+            pdf_q = st.text_input("Ask any question grounded in the uploaded document:")
+            if st.button("Search Document") and pdf_q:
+                with st.spinner("Analyzing document..."):
+                    ans = call_groq_llm(f"Document Context: {st.session_state['pdf_context']}\n\nQuestion: {pdf_q}")
+                    st.markdown(ans)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with col_cd2:
+    # 7. Career Discovery & Skills
+    elif "Career Discovery" in nav_selected:
         st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        st.markdown("### ⚠️ Skill Gap Analysis (Target: Data Analyst)")
+        st.markdown("### 🎯 Skill Gap & Project Recommendation Matrix")
         
-        gap_df = pd.DataFrame(st.session_state.skill_gaps)
-        st.dataframe(gap_df, use_container_width=True)
-
-        if st.button("Recommend Portfolio Projects for Skill Gaps"):
-            with st.spinner("Finding optimal projects..."):
-                prompt = f"""
-                Target Career: {st.session_state.profile['career_goal']}
-                Missing Skills: {[g['skill'] for g in st.session_state.skill_gaps]}
-                
-                Suggest 2 actionable portfolio projects with:
-                - Title
-                - Tech Stack
-                - Key Features
-                - Portfolio Value
-                """
-                projects = call_groq_llm(prompt)
-                st.markdown(projects)
+        st.dataframe(pd.DataFrame(st.session_state.skill_gaps), use_container_width=True)
+        
+        if st.button("Suggest Portfolio Projects to Fill Skill Gaps"):
+            with st.spinner("Selecting optimal projects..."):
+                p_ideas = call_groq_llm(f"Suggest 2 portfolio projects for a {st.session_state.profile['career_goal']} targeting missing skills: Power BI and Advanced SQL.")
+                st.markdown(p_ideas)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# 8. CV & Job Matcher
-elif nav == "CV & Job Matcher":
-    st.markdown("<h2 class='lcs-header'>📄 CV Analyzer & Job Match Engine</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='lcs-subheader'>Evaluate your CV alignment and match against target job descriptions.</p>", unsafe_allow_html=True)
-
-    tab_cv1, tab_cv2 = st.tabs(["CV Analysis & Score", "Job Description Matcher"])
-
-    with tab_cv1:
+    # 8. CV & Job Matcher
+    elif "CV & Job Matcher" in nav_selected:
         st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        st.markdown("### Upload & Audit Resume / CV")
-        cv_file = st.file_uploader("Upload CV (PDF)", type=["pdf"], key="cv_uploader")
+        st.markdown("### 📄 Job Description & Profile Matcher")
         
-        if cv_file:
-            reader = PdfReader(cv_file)
-            cv_text = "".join([page.extract_text() for page in reader.pages if page.extract_text()])
-            st.success("CV Extracted Successfully!")
-            
-            if st.button("Analyze CV Quality"):
-                with st.spinner("Auditing CV content..."):
-                    prompt = f"Audit this CV text for a student targeting {st.session_state.profile['career_goal']}:\n\n{cv_text[:3000]}\n\nProvide: CV Score out of 100, Strengths, Weaknesses, and Formatting / Action Bullet improvements."
-                    cv_res = call_groq_llm(prompt)
-                    st.markdown(cv_res)
+        jd = st.text_area("Paste Target Job Description (JD):", height=150)
+        if st.button("Calculate Match & Skill Fit") and jd:
+            with st.spinner("Comparing skills with Job Description..."):
+                match_res = call_groq_llm(f"Compare student profile skills: {st.session_state.profile['skills']} against this JD:\n\n{jd}")
+                st.markdown(match_res)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with tab_cv2:
+    # 9. Interview Intelligence
+    elif "Interview Intelligence" in nav_selected:
         st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        st.markdown("### Match Profile with Target Job Description")
-        jd_text = st.text_area("Paste Target Job Description (JD) here:", height=180)
+        st.markdown("### 🎤 Mock Interview Simulator")
         
-        if st.button("Calculate Match & Skill Fit"):
-            if jd_text:
-                with st.spinner("Matching skills with Job Description..."):
-                    prompt = f"""
-                    Student Skills: {', '.join(st.session_state.profile['skills'])}
-                    Student Projects: {', '.join(st.session_state.profile['projects'])}
-                    Job Description: {jd_text}
+        if st.button("Get Technical Question"):
+            with st.spinner("Generating interview question..."):
+                q = call_groq_llm(f"Ask 1 technical interview question for a {st.session_state.profile['career_goal']} role.")
+                st.session_state['interview_q'] = q
 
-                    Provide:
-                    1. Overall Match Percentage
-                    2. Matching Skills Checkmarks
-                    3. Missing Required Skills
-                    4. Recommended Cover Letter Bullet Points
-                    """
-                    jd_res = call_groq_llm(prompt)
-                    st.markdown(jd_res)
-            else:
-                st.warning("Please paste a job description first.")
-        st.markdown("</div>", unsafe_allow_html=True)
-
-# 9. Interview Intelligence
-elif nav == "Interview Intelligence":
-    st.markdown("<h2 class='lcs-header'>🎤 Mock Interview Simulator</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='lcs-subheader'>Practise HR, technical, and behavioral interview questions with AI evaluation.</p>", unsafe_allow_html=True)
-
-    st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-    interview_type = st.selectbox("Select Interview Focus", ["Technical Questions", "Behavioral (STAR Method)", "HR & Soft Skills"])
-    
-    if st.button("Generate Practice Questions"):
-        with st.spinner("Preparing interview question..."):
-            prompt = f"Generate 1 key {interview_type} interview question for a {st.session_state.profile['career_goal']} candidate."
-            q = call_groq_llm(prompt)
-            st.session_state['interview_question'] = q
-
-    if 'interview_question' in st.session_state:
-        st.markdown("### ❓ Question")
-        st.info(st.session_state['interview_question'])
-        
-        user_response = st.text_area("Your Response / Answer:")
-        if st.button("Evaluate Answer & Feedback"):
-            with st.spinner("Evaluating interview response..."):
-                eval_p = f"""
-                Question: {st.session_state['interview_question']}
-                User Response: {user_response}
-
-                Rate the response out of 10 and give actionable feedback to improve clarity, technical depth, or structure.
-                """
-                feedback = call_groq_llm(eval_p)
+        if 'interview_q' in st.session_state:
+            st.info(st.session_state['interview_q'])
+            ans = st.text_area("Your Response / Answer:")
+            if st.button("Evaluate Response") and ans:
+                feedback = call_groq_llm(f"Question: {st.session_state['interview_q']}\nAnswer: {ans}\nEvaluate out of 10 and suggest improvements.")
                 st.markdown(feedback)
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-# 10. Analytics & Next Action
-elif nav == "Analytics & Next Action":
-    st.markdown("<h2 class='lcs-header'>📈 Platform Analytics & Continuous Guidance</h2>", unsafe_allow_html=True)
-    st.markdown("<p class='lcs-subheader'>Comprehensive readiness tracking and next best action engine.</p>", unsafe_allow_html=True)
-
-    col_a1, col_a2 = st.columns(2)
-
-    with col_a1:
+    # 10. Analytics & Next Action
+    elif "Analytics" in nav_selected:
         st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        st.markdown("### 📊 Career Readiness Score Breakdown")
+        st.markdown("### 📈 Comprehensive Growth Analytics")
         
         readiness_data = pd.DataFrame({
-            'Metric': ['Skills Alignment', 'Project Portfolio', 'Education', 'CV Quality', 'Interview Practice'],
+            'Metric': ['Skills', 'Projects', 'Academic', 'CV Fit', 'Interview'],
             'Score': [88, 80, 92, 84, 78]
         })
         
@@ -723,31 +487,17 @@ elif nav == "Analytics & Next Action":
             r=readiness_data['Score'],
             theta=readiness_data['Metric'],
             fill='toself',
-            fillcolor='rgba(108, 99, 255, 0.3)',
+            fillcolor='rgba(108, 99, 255, 0.25)',
             line=dict(color='#6C63FF')
         ))
-        fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), showlegend=False, height=300, margin=dict(l=20, r=20, t=20, b=20))
+        fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), showlegend=False, height=280)
         st.plotly_chart(fig_radar, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    with col_a2:
-        st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
-        st.markdown("### 🎯 Priority Action List")
-        st.markdown("""
-        1. **Revise Relational SQL JOINs**  
-           *Reason:* Quiz performance indicates ambiguity in multi-table queries.
-        2. **Build Power BI Analytics Project**  
-           *Reason:* Fills the high-priority skill gap for target Data Analyst role.
-        3. **Practise Behavioral Interview STAR Answers**  
-           *Reason:* Boost interview readiness score above 85%.
-        """)
         st.markdown("</div>", unsafe_allow_html=True)
 
 # Footer
 st.markdown("<br><hr>", unsafe_allow_html=True)
 st.markdown("""
-<div style="text-align: center; color: #718096; font-size: 0.85rem; padding: 10px 0;">
-    Designed & Developed by Areeba Imran<br>
-    © 2026 Learning & Career Studio (LCS). All rights reserved.
+<div style="text-align: center; color: #64748B; font-size: 0.85rem; padding: 10px 0;">
+    Designed & Developed by <b>Areeba Imran</b> | © 2026 Learning & Career Studio (LCS)
 </div>
 """, unsafe_allow_html=True)
