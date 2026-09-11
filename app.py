@@ -3,9 +3,6 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-import json
-import re
-from io import BytesIO
 from pypdf import PdfReader
 from groq import Groq
 
@@ -20,7 +17,6 @@ st.set_page_config(
 # Custom CSS for LCS Theme
 st.markdown("""
 <style>
-    /* Global Styles & Variables */
     :root {
         --deep-navy: #182B49;
         --royal-purple: #6C63FF;
@@ -40,7 +36,6 @@ st.markdown("""
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* Card styling */
     .lcs-card {
         background-color: #FFFFFF;
         border-radius: 12px;
@@ -48,13 +43,6 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(24, 43, 73, 0.05);
         border: 1px solid #EAEFF5;
         margin-bottom: 20px;
-    }
-    .lcs-card-accent {
-        background-color: var(--bg-cool-lavender);
-        border-left: 5px solid var(--royal-purple);
-        border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 15px;
     }
     .lcs-card-highlight {
         background-color: var(--blush-pink);
@@ -64,7 +52,6 @@ st.markdown("""
         margin-bottom: 15px;
     }
 
-    /* Headers */
     .lcs-header {
         color: var(--deep-navy);
         font-weight: 700;
@@ -76,7 +63,6 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    /* Metric Badges */
     .metric-box {
         background: white;
         border-radius: 10px;
@@ -97,7 +83,6 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
 
-    /* Buttons */
     .stButton>button {
         background-color: var(--royal-purple);
         color: white;
@@ -112,29 +97,14 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
     }
 
-    /* Sidebar adjustments */
     section[data-testid="stSidebar"] {
         background-color: #F8F9FD;
         border-right: 1px solid #EAEFF5;
     }
-
-    /* Chat Drawer / Widget Styling */
-    .chat-header {
-        background-color: var(--deep-navy);
-        color: white;
-        padding: 12px 16px;
-        border-radius: 10px 10px 0 0;
-        font-weight: 600;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# SESSION STATE INITIALIZATION
-# ------------------------------------------------------------------------------
+# Session State Initialization
 def init_session_state():
     defaults = {
         'groq_api_key': '',
@@ -188,11 +158,10 @@ def init_session_state():
 
 init_session_state()
 
-# Helper function for Groq LLM API
 def call_groq_llm(prompt, system_prompt="You are an intelligent educational and career advisor AI for Learning & Career Studio (LCS)."):
     api_key = st.session_state.get('groq_api_key', '')
     if not api_key:
-        return "⚠️ Groq API key is not configured. Please set the GROQ_API_KEY environment variable or enter it in the top settings."
+        return "⚠️ Groq API key is not configured. Please enter it in the sidebar settings."
     try:
         client = Groq(api_key=api_key)
         completion = client.chat.completions.create(
@@ -208,15 +177,12 @@ def call_groq_llm(prompt, system_prompt="You are an intelligent educational and 
     except Exception as e:
         return f"Error contacting Groq API: {str(e)}"
 
-# ------------------------------------------------------------------------------
-# SIDEBAR NAVIGATION
-# ------------------------------------------------------------------------------
+# Sidebar Navigation
 with st.sidebar:
     st.markdown("<h2 style='color: #182B49; margin-bottom: 0;'>🎓 LCS</h2>", unsafe_allow_html=True)
     st.markdown("<p style='color: #6C63FF; font-weight: 600; font-size: 0.85rem;'>Learning & Career Studio</p>", unsafe_allow_html=True)
     st.divider()
 
-    # Groq API Key Input
     if not st.session_state['groq_api_key']:
         api_input = st.text_input("Enter Groq API Key", type="password", key="groq_key_input")
         if api_input:
@@ -245,16 +211,13 @@ with st.sidebar:
 
     st.divider()
 
-    # Agent Quick Trigger Button
     if st.button("💬 Toggle LCS Agent Panel", use_container_width=True):
         st.session_state['agent_open'] = not st.session_state['agent_open']
 
-# ------------------------------------------------------------------------------
-# TOP BAR & HEADER
-# ------------------------------------------------------------------------------
+# Main Header
 col_head1, col_head2 = st.columns([3, 1])
 with col_head1:
-    st.markdown(f"<h1 style='color: #182B49; font-size: 2rem; margin-bottom: 0;'>Learning & Career Studio</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='color: #182B49; font-size: 2rem; margin-bottom: 0;'>Learning & Career Studio</h1>", unsafe_allow_html=True)
     st.markdown("<p style='color: #5A6B82; font-size: 1rem;'>Intelligent Student Ecosystem — School to Career Mastery</p>", unsafe_allow_html=True)
 
 with col_head2:
@@ -268,9 +231,7 @@ with col_head2:
 
 st.divider()
 
-# ------------------------------------------------------------------------------
-# RIGHT-SIDE / FLOATING LIVE LCS AGENT WIDGET
-# ------------------------------------------------------------------------------
+# Agent Drawer
 if st.session_state['agent_open']:
     with st.expander("🤖 LCS Intelligent Agent (Context-Aware Assistant)", expanded=True):
         st.markdown("""
@@ -288,7 +249,6 @@ if st.session_state['agent_open']:
         if user_query:
             st.session_state.chat_history.append({"role": "user", "content": user_query})
             
-            # Construct context
             context_prompt = f"""
             Student Context:
             - Name: {st.session_state.profile['name']}
@@ -308,14 +268,11 @@ if st.session_state['agent_open']:
                 st.session_state.chat_history.append({"role": "assistant", "content": reply})
                 st.rerun()
 
-# ------------------------------------------------------------------------------
-# 1. DASHBOARD NAVIGATION VIEW
-# ------------------------------------------------------------------------------
+# 1. Dashboard
 if nav == "Dashboard":
     st.markdown("<h2 class='lcs-header'>📊 Executive Student Dashboard</h2>", unsafe_allow_html=True)
     st.markdown("<p class='lcs-subheader'>Overview of learning momentum, skill acquisition, and career readiness.</p>", unsafe_allow_html=True)
 
-    # KPI Metrics Row
     m1, m2, m3, m4 = st.columns(4)
     with m1:
         st.markdown("""
@@ -348,7 +305,6 @@ if nav == "Dashboard":
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Next Best Action Card
     st.markdown("""
     <div class="lcs-card-highlight">
         <h4 style="margin:0 0 5px 0; color: #182B49;">⚡ Next Best Action Recommendation</h4>
@@ -382,20 +338,15 @@ if nav == "Dashboard":
         st.plotly_chart(fig_pie, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Weak Topics Summary
     st.markdown("<div class='lcs-card'>", unsafe_allow_html=True)
     st.markdown("<h3 class='lcs-header'>⚠️ Detected Weak Topics Needing Revision</h3>", unsafe_allow_html=True)
     cols = st.columns(len(st.session_state.weak_topics))
     for idx, topic in enumerate(st.session_state.weak_topics):
         with cols[idx]:
-            st.warning(f"**{topic}**
-
-*Action Required: Take practice quiz & review notes.*")
+            st.warning(f"**{topic}**\n\n*Action Required: Take practice quiz & review notes.*")
     st.markdown("</div>", unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# 2. MY PROFILE
-# ------------------------------------------------------------------------------
+# 2. My Profile
 elif nav == "My Profile":
     st.markdown("<h2 class='lcs-header'>👤 Student Profile & Preferences</h2>", unsafe_allow_html=True)
     st.markdown("<p class='lcs-subheader'>Configure academic credentials, current skills, and career direction.</p>", unsafe_allow_html=True)
@@ -434,9 +385,7 @@ elif nav == "My Profile":
             })
             st.success("Profile saved successfully! Intelligence modules updated.")
 
-# ------------------------------------------------------------------------------
-# 3. STUDY WORKSPACE
-# ------------------------------------------------------------------------------
+# 3. Study Workspace
 elif nav == "Study Workspace":
     st.markdown("<h2 class='lcs-header'>📖 Intelligent Study Workspace</h2>", unsafe_allow_html=True)
     st.markdown("<p class='lcs-subheader'>Deep-dive into subject topics with automated AI explanations and key summaries.</p>", unsafe_allow_html=True)
@@ -483,9 +432,7 @@ elif nav == "Study Workspace":
             st.info("👈 Select a subject and topic, then click 'Generate Study Insights' to begin.")
         st.markdown("</div>", unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# 4. STUDY ROADMAP & PLANNER
-# ------------------------------------------------------------------------------
+# 4. Study Roadmap & Planner
 elif nav == "Study Roadmap & Planner":
     st.markdown("<h2 class='lcs-header'>🗺️ Dynamic Study Roadmap & Planner</h2>", unsafe_allow_html=True)
     st.markdown("<p class='lcs-subheader'>Adaptive learning timeline based on mastery levels and upcoming exams.</p>", unsafe_allow_html=True)
@@ -539,9 +486,7 @@ elif nav == "Study Roadmap & Planner":
                 st.markdown(plan)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# 5. QUIZZES & MOCK EXAMS
-# ------------------------------------------------------------------------------
+# 5. Quizzes & Mock Exams
 elif nav == "Quizzes & Mock Exams":
     st.markdown("<h2 class='lcs-header'>✏️ Quiz Generator & Adaptive Mock Exams</h2>", unsafe_allow_html=True)
     st.markdown("<p class='lcs-subheader'>Test knowledge, receive immediate evaluation, and update weak topic detection.</p>", unsafe_allow_html=True)
@@ -584,13 +529,10 @@ elif nav == "Quizzes & Mock Exams":
                 eval_res = call_groq_llm(eval_prompt)
                 st.markdown(eval_res)
                 
-                # Add score entry
                 st.session_state.quiz_results.append({'subject': q_subj, 'topic': q_topic, 'score': 'Evaluated'})
     st.markdown("</div>", unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# 6. PDF MATERIAL & RAG
-# ------------------------------------------------------------------------------
+# 6. PDF Material & RAG
 elif nav == "PDF Material & RAG":
     st.markdown("<h2 class='lcs-header'>📚 PDF Material RAG Intelligence</h2>", unsafe_allow_html=True)
     st.markdown("<p class='lcs-subheader'>Upload lecture slides or notes to query, summarize, or extract quiz questions.</p>", unsafe_allow_html=True)
@@ -604,8 +546,7 @@ elif nav == "PDF Material & RAG":
             for page in reader.pages:
                 text = page.extract_text()
                 if text:
-                    extracted_text += text + "
-"
+                    extracted_text += text + "\n"
             
             st.session_state['rag_text'] = extracted_text
             st.success(f"Successfully processed PDF! Extracted {len(extracted_text)} characters.")
@@ -622,30 +563,20 @@ elif nav == "PDF Material & RAG":
             if st.button("Answer Query"):
                 if pdf_query:
                     with st.spinner("Searching document context..."):
-                        # Lightweight chunk grounding
-                        doc_snippet = st.session_state['rag_text'][:4000] # Fit in context
-                        prompt = f"Document Context:
-{doc_snippet}
-
-Question: {pdf_query}
-Answer based ONLY on the context provided:"
+                        doc_snippet = st.session_state['rag_text'][:4000]
+                        prompt = f"Document Context:\n{doc_snippet}\n\nQuestion: {pdf_query}\nAnswer based ONLY on the context provided:"
                         ans = call_groq_llm(prompt)
                         st.markdown(ans)
         with col_rag2:
             if st.button("Generate Notes & Summary"):
                 with st.spinner("Summarizing document..."):
                     doc_snippet = st.session_state['rag_text'][:4000]
-                    prompt = f"Document Context:
-{doc_snippet}
-
-Provide key revision bullet points and concise summary:"
+                    prompt = f"Document Context:\n{doc_snippet}\n\nProvide key revision bullet points and concise summary:"
                     summary = call_groq_llm(prompt)
                     st.markdown(summary)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# 7. CAREER DISCOVERY & SKILLS
-# ------------------------------------------------------------------------------
+# 7. Career Discovery & Skills
 elif nav == "Career Discovery & Skills":
     st.markdown("<h2 class='lcs-header'>🎯 Career Discovery & Skill Gap Matrix</h2>", unsafe_allow_html=True)
     st.markdown("<p class='lcs-subheader'>Discover high-alignment career paths and pinpoint technical skill gaps.</p>", unsafe_allow_html=True)
@@ -692,9 +623,7 @@ elif nav == "Career Discovery & Skills":
                 st.markdown(projects)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# 8. CV & JOB MATCHER
-# ------------------------------------------------------------------------------
+# 8. CV & Job Matcher
 elif nav == "CV & Job Matcher":
     st.markdown("<h2 class='lcs-header'>📄 CV Analyzer & Job Match Engine</h2>", unsafe_allow_html=True)
     st.markdown("<p class='lcs-subheader'>Evaluate your CV alignment and match against target job descriptions.</p>", unsafe_allow_html=True)
@@ -713,11 +642,7 @@ elif nav == "CV & Job Matcher":
             
             if st.button("Analyze CV Quality"):
                 with st.spinner("Auditing CV content..."):
-                    prompt = f"Audit this CV text for a student targeting {st.session_state.profile['career_goal']}:
-
-{cv_text[:3000]}
-
-Provide: CV Score out of 100, Strengths, Weaknesses, and Formatting / Action Bullet improvements."
+                    prompt = f"Audit this CV text for a student targeting {st.session_state.profile['career_goal']}:\n\n{cv_text[:3000]}\n\nProvide: CV Score out of 100, Strengths, Weaknesses, and Formatting / Action Bullet improvements."
                     cv_res = call_groq_llm(prompt)
                     st.markdown(cv_res)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -747,9 +672,7 @@ Provide: CV Score out of 100, Strengths, Weaknesses, and Formatting / Action Bul
                 st.warning("Please paste a job description first.")
         st.markdown("</div>", unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# 9. INTERVIEW INTELLIGENCE
-# ------------------------------------------------------------------------------
+# 9. Interview Intelligence
 elif nav == "Interview Intelligence":
     st.markdown("<h2 class='lcs-header'>🎤 Mock Interview Simulator</h2>", unsafe_allow_html=True)
     st.markdown("<p class='lcs-subheader'>Practise HR, technical, and behavioral interview questions with AI evaluation.</p>", unsafe_allow_html=True)
@@ -780,9 +703,7 @@ elif nav == "Interview Intelligence":
                 st.markdown(feedback)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# 10. ANALYTICS & NEXT ACTION
-# ------------------------------------------------------------------------------
+# 10. Analytics & Next Action
 elif nav == "Analytics & Next Action":
     st.markdown("<h2 class='lcs-header'>📈 Platform Analytics & Continuous Guidance</h2>", unsafe_allow_html=True)
     st.markdown("<p class='lcs-subheader'>Comprehensive readiness tracking and next best action engine.</p>", unsafe_allow_html=True)
@@ -822,9 +743,7 @@ elif nav == "Analytics & Next Action":
         """)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# FOOTER / CREDIT
-# ------------------------------------------------------------------------------
+# Footer
 st.markdown("<br><hr>", unsafe_allow_html=True)
 st.markdown("""
 <div style="text-align: center; color: #718096; font-size: 0.85rem; padding: 10px 0;">
